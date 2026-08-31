@@ -1,23 +1,52 @@
 import React, { useState } from 'react';
 import { Calendar, Quote, ExternalLink, FileText, ChevronDown, ChevronUp, Tag } from 'lucide-react';
 
+function safeParseArray(val) {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string') {
+    try {
+      const parsed = JSON.parse(val);
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed && typeof parsed === 'object') return [parsed];
+      return [val];
+    } catch {
+      return [val];
+    }
+  }
+  if (typeof val === 'object') return [val];
+  return [];
+}
+
 export default function PaperCard({ paper, onOpenModal }) {
   const [expanded, setExpanded] = useState(false);
 
   // Extract author names safely
-  const authorNames = Array.isArray(paper.authors)
-    ? paper.authors
-        .map((a) => (typeof a === 'string' ? a : a?.author?.display_name || a?.raw_author_name))
-        .filter(Boolean)
-    : [];
+  const rawAuthors = safeParseArray(paper.authors || paper.authorships);
+  const authorNames = rawAuthors
+    .map((a) => (typeof a === 'string' ? a : a?.author?.display_name || a?.display_name || a?.raw_author_name || a?.name))
+    .filter(Boolean);
 
   // Extract topic names safely
-  const topicNames = Array.isArray(paper.topics)
-    ? paper.topics
-        .map((t) => (typeof t === 'string' ? t : t?.display_name || t?.name))
-        .filter(Boolean)
-        .slice(0, 3)
-    : [];
+  const rawTopics = safeParseArray(paper.topics);
+  const topicNames = rawTopics
+    .map((t) => (typeof t === 'string' ? t : t?.display_name || t?.name || t?.subfield?.display_name))
+    .filter(Boolean)
+    .slice(0, 3);
+
+  const publicationYear =
+    paper.publication_year ||
+    paper.year ||
+    (paper.publication_date ? new Date(paper.publication_date).getFullYear() : null);
+
+  const citationCount =
+    typeof paper.citation_count === 'number'
+      ? paper.citation_count
+      : typeof paper.cited_by_count === 'number'
+      ? paper.cited_by_count
+      : paper.citation_count !== undefined && paper.citation_count !== null && !isNaN(Number(paper.citation_count))
+      ? Number(paper.citation_count)
+      : null;
 
   return (
     <div className="glass-panel glass-panel-hover animate-fade-in" style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -25,16 +54,16 @@ export default function PaperCard({ paper, onOpenModal }) {
       {/* Top Meta Badges */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {paper.publication_year && (
+          {publicationYear && (
             <span className="badge badge-indigo">
               <Calendar size={12} />
-              {paper.publication_year}
+              {publicationYear}
             </span>
           )}
-          {typeof paper.citation_count === 'number' && (
+          {citationCount !== null && (
             <span className="badge badge-emerald">
               <Quote size={12} />
-              {paper.citation_count.toLocaleString()} citations
+              {citationCount.toLocaleString()} citations
             </span>
           )}
         </div>
