@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from './context/AuthContext';
-import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+import RightPanel from './components/RightPanel';
 import AuthPage from './pages/AuthPage';
 import PapersPage from './pages/PapersPage';
 import IngestPage from './pages/IngestPage';
@@ -9,7 +11,8 @@ import { Loader2 } from 'lucide-react';
 
 export default function App() {
   const { isAuthenticated, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState('papers'); // 'papers' | 'ingest' | 'users'
+  const [activeTab, setActiveTab] = useState('papers');
+  const [searchQuery, setSearchQuery] = useState('');
 
   if (loading) {
     return (
@@ -20,10 +23,11 @@ export default function App() {
         alignItems: 'center',
         justifyContent: 'center',
         gap: '14px',
+        backgroundColor: 'var(--app-bg)',
         color: 'var(--text-secondary)'
       }}>
-        <Loader2 size={40} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
-        <div style={{ fontSize: '15px', fontWeight: 600 }}>Loading Research RAG...</div>
+        <Loader2 size={42} className="animate-spin" style={{ color: 'var(--accent-purple)' }} />
+        <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-main)' }}>Loading Research RAG...</div>
       </div>
     );
   }
@@ -32,22 +36,53 @@ export default function App() {
     return <AuthPage />;
   }
 
+  const handleTriggerSearch = (term) => {
+    setActiveTab('papers');
+    setSearchQuery(term);
+  };
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
-      
-      <main style={{ flex: 1, padding: '24px 0' }}>
-        {activeTab === 'papers' && (
-          <PapersPage onNavigateToIngest={() => setActiveTab('ingest')} />
-        )}
-        {activeTab === 'ingest' && (
-          <IngestPage onNavigateToPapers={() => setActiveTab('papers')} />
-        )}
-        {activeTab === 'users' && (
-          <UsersPage />
-        )}
-      </main>
+    <div className="dashboard-wrapper">
+      <div className="dashboard-shell">
+
+        {/* Left Sidebar */}
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+
+        {/* Center + Right */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+          {/* Top Header */}
+          <Header onSearch={handleTriggerSearch} defaultQuery={searchQuery} />
+
+          {/* Main workspace + right rail */}
+          <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+
+            {/* Center scrollable workspace */}
+            <main style={{ flex: 1, overflowY: 'auto', background: 'var(--content-bg)' }}>
+              {activeTab === 'papers' && (
+                <PapersPage
+                  onNavigateToIngest={() => setActiveTab('ingest')}
+                  externalQuery={searchQuery}
+                />
+              )}
+              {activeTab === 'ingest' && (
+                <IngestPage onNavigateToPapers={() => setActiveTab('papers')} />
+              )}
+              {activeTab === 'users' && (
+                <UsersPage />
+              )}
+            </main>
+
+            {/* Right information rail */}
+            <RightPanel
+              onSelectTopic={handleTriggerSearch}
+              onSelectAuthor={handleTriggerSearch}
+            />
+
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
-
