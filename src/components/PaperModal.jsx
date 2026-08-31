@@ -84,8 +84,8 @@ export default function PaperModal({ paper, onClose }) {
         bottom: 0,
         width: '100vw',
         height: '100vh',
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        backdropFilter: 'blur(8px)',
+        backgroundColor: 'rgba(15, 23, 42, 0.45)',
+        backdropFilter: 'blur(6px)',
         zIndex: 99999,
         display: 'flex',
         alignItems: 'center',
@@ -95,17 +95,17 @@ export default function PaperModal({ paper, onClose }) {
       onClick={onClose}
     >
       <div
-        className="glass-panel animate-fade-in"
+        className="animate-fade-in"
         style={{
           width: '100%',
-          maxWidth: '800px',
+          maxWidth: '820px',
           maxHeight: '88vh',
           overflowY: 'auto',
-          padding: '30px',
-          background: 'rgba(15, 23, 42, 0.96)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          borderRadius: '16px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+          padding: '32px',
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '24px',
+          boxShadow: '0 25px 60px -15px rgba(74, 21, 157, 0.25)',
           position: 'relative',
         }}
         onClick={(e) => e.stopPropagation()}
@@ -113,15 +113,24 @@ export default function PaperModal({ paper, onClose }) {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="btn btn-secondary"
-          aria-label="Close modal"
           style={{
             position: 'absolute',
-            top: '20px',
-            right: '20px',
+            top: '22px',
+            right: '22px',
             padding: '8px',
             borderRadius: '50%',
+            background: '#f1f5f9',
+            border: 'none',
+            color: 'var(--text-secondary)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.15s ease'
           }}
+          aria-label="Close modal"
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
         >
           <X size={18} />
         </button>
@@ -149,21 +158,21 @@ export default function PaperModal({ paper, onClose }) {
         </div>
 
         {/* Title */}
-        <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: '20px' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.4, marginBottom: '20px' }}>
           {paper.title || 'Untitled Research Paper'}
         </h2>
 
         {/* Authors & Affiliations */}
         {authorsList.length > 0 && (
           <div style={{ marginBottom: '22px' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <User size={14} />
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <User size={13} style={{ color: 'var(--accent-purple)' }} />
               Authors & Affiliations
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {authorsList.map((author, idx) => (
-                <div key={idx} style={{ fontSize: '13px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 600, color: '#e2e8f0' }}>{author.name}</span>
+                <div key={idx} style={{ fontSize: '13px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 700 }}>{author.name}</span>
                   {author.institutions.length > 0 && (
                     <span style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <Building size={11} style={{ opacity: 0.7 }} />
@@ -178,19 +187,19 @@ export default function PaperModal({ paper, onClose }) {
 
         {/* Abstract */}
         <div style={{ marginBottom: '24px' }}>
-          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <BookOpen size={14} />
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <BookOpen size={13} style={{ color: 'var(--accent-purple)' }} />
             Abstract
           </div>
           {paper.abstract ? (
             <div style={{
-              fontSize: '14px',
+              fontSize: '13.5px',
               color: 'var(--text-secondary)',
               lineHeight: 1.7,
-              background: 'rgba(0, 0, 0, 0.4)',
-              padding: '16px',
-              borderRadius: '10px',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
+              background: '#f8fafc',
+              padding: '18px',
+              borderRadius: '14px',
+              border: '1px solid #f1f5f9',
               whiteSpace: 'pre-line'
             }}>
               {paper.abstract}
@@ -198,16 +207,16 @@ export default function PaperModal({ paper, onClose }) {
           ) : (
             <div style={{
               fontSize: '13px',
-              color: 'var(--text-muted)',
-              background: 'rgba(255, 255, 255, 0.02)',
-              padding: '14px 16px',
-              borderRadius: '10px',
-              border: '1px dashed rgba(255, 255, 255, 0.1)',
+              color: 'var(--text-secondary)',
+              background: '#f8fafc',
+              padding: '16px 18px',
+              borderRadius: '14px',
+              border: '1px dashed #cbd5e1',
               display: 'flex',
               alignItems: 'center',
               gap: '10px'
             }}>
-              <Info size={16} style={{ flexShrink: 0, color: '#94a3b8' }} />
+              <Info size={16} style={{ flexShrink: 0, color: 'var(--accent-purple)' }} />
               <span>
                 No abstract text was indexed for this paper in OpenAlex. You can access the full publication via the DOI or OpenAlex source links below.
               </span>
@@ -218,8 +227,8 @@ export default function PaperModal({ paper, onClose }) {
         {/* Topics */}
         {topicNames.length > 0 && (
           <div style={{ marginBottom: '20px' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Tag size={13} />
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Tag size={13} style={{ color: 'var(--accent-cyan)' }} />
               Research Topics
             </div>
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -235,7 +244,7 @@ export default function PaperModal({ paper, onClose }) {
         {/* Keywords */}
         {keywordNames.length > 0 && (
           <div style={{ marginBottom: '24px' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>
               Keywords
             </div>
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -246,9 +255,10 @@ export default function PaperModal({ paper, onClose }) {
                     fontSize: '11px',
                     padding: '3px 8px',
                     borderRadius: '6px',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    color: 'var(--text-secondary)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)'
+                    background: '#f1f5f9',
+                    color: 'var(--text-main)',
+                    border: '1px solid #e2e8f0',
+                    fontWeight: 600
                   }}
                 >
                   #{keyword}
@@ -259,14 +269,14 @@ export default function PaperModal({ paper, onClose }) {
         )}
 
         {/* Actions / External Links */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '18px', borderTop: '1px solid var(--border-color)', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '18px', borderTop: '1px solid #f1f5f9', flexWrap: 'wrap' }}>
           {openAlexUrl && (
             <a
               href={openAlexUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary"
-              style={{ fontSize: '13px' }}
+              style={{ fontSize: '13px', borderRadius: '10px' }}
             >
               <ExternalLink size={14} />
               View on OpenAlex
@@ -278,13 +288,17 @@ export default function PaperModal({ paper, onClose }) {
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-primary"
-              style={{ fontSize: '13px' }}
+              style={{ fontSize: '13px', borderRadius: '10px' }}
             >
               <ExternalLink size={14} />
               Open Publisher (DOI)
             </a>
           )}
-          <button onClick={onClose} className="btn btn-secondary" style={{ fontSize: '13px' }}>
+          <button 
+            onClick={onClose} 
+            className="btn btn-secondary" 
+            style={{ fontSize: '13px', borderRadius: '10px' }}
+          >
             Close
           </button>
         </div>
