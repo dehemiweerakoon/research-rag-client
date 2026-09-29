@@ -83,7 +83,7 @@ export default function PaperCard({ paper, onOpenModal }) {
       </div>
 
       {/* Paper Title */}
-      <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#fff', lineHeight: 1.4, cursor: 'pointer' }} onClick={() => onOpenModal(paper)}>
+      <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.4, cursor: 'pointer' }} onClick={() => onOpenModal(paper)}>
         {paper.title || 'Untitled Research Paper'}
       </h3>
 
@@ -97,14 +97,14 @@ export default function PaperCard({ paper, onOpenModal }) {
 
       {/* Abstract preview */}
       {paper.abstract && (
-        <div style={{ fontSize: '13px', color: 'var(--text-secondary)', background: 'rgba(0, 0, 0, 0.25)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.04)' }}>
+        <div style={{ fontSize: '13px', color: 'var(--text-secondary)', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
           <p style={{ lineHeight: 1.5 }}>
             {expanded ? paper.abstract : `${paper.abstract.slice(0, 180)}...`}
           </p>
           {paper.abstract.length > 180 && (
             <button
               onClick={() => setExpanded(!expanded)}
-              style={{ background: 'none', border: 'none', color: '#a5b4fc', fontSize: '12px', fontWeight: 600, cursor: 'pointer', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}
+              style={{ background: 'none', border: 'none', color: 'var(--accent-purple)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               {expanded ? <>Show less <ChevronUp size={12} /></> : <>Read more <ChevronDown size={12} /></>}
             </button>
@@ -137,4 +137,3 @@ export default function PaperCard({ paper, onOpenModal }) {
     </div>
   );
 }
-

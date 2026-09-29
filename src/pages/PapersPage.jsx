@@ -14,8 +14,13 @@ import {
   Minus,
   Plus,
   CheckCircle,
-  Layers
+  Layers,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
+
+const PAPERS_PER_PAGE = 9;
+const PAGE_BUTTONS_LIMIT = 10;
 
 export default function PapersPage({ onNavigateToIngest, externalQuery }) {
   const { user } = useAuth();
@@ -32,6 +37,7 @@ export default function PapersPage({ onNavigateToIngest, externalQuery }) {
   const [yearFilter, setYearFilter] = useState(2020);
   const [onlyDoi, setOnlyDoi] = useState(false);
   const [onlyAbstract, setOnlyAbstract] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const displayName = user?.name || user?.email?.split('@')[0] || 'Researcher';
 
@@ -44,6 +50,7 @@ export default function PapersPage({ onNavigateToIngest, externalQuery }) {
     try {
       const res = await paperService.searchPapers(term.trim());
       setPapers(res.data?.papers || []);
+      setCurrentPage(1);
     } catch (err) {
       console.error('Failed to search papers:', err);
       setError(err.response?.data?.message || err.message || 'Failed to search papers');
@@ -82,6 +89,17 @@ export default function PapersPage({ onNavigateToIngest, externalQuery }) {
     if (sortBy === 'title') return (a.title || '').localeCompare(b.title || '');
     return 0;
   });
+  const totalPages = Math.ceil(sortedPapers.length / PAPERS_PER_PAGE);
+  const firstVisiblePage = Math.floor((currentPage - 1) / PAGE_BUTTONS_LIMIT) * PAGE_BUTTONS_LIMIT + 1;
+  const lastVisiblePage = Math.min(firstVisiblePage + PAGE_BUTTONS_LIMIT - 1, totalPages);
+  const paginatedPapers = sortedPapers.slice(
+    (currentPage - 1) * PAPERS_PER_PAGE,
+    currentPage * PAPERS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [minCitations, yearFilter, onlyDoi, onlyAbstract]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '24px 28px' }}>
@@ -204,7 +222,7 @@ export default function PapersPage({ onNavigateToIngest, externalQuery }) {
           <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <Filter size={13} /> Sort by:
           </span>
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}
+          <select value={sortBy} onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
             style={{ padding: '6px 12px', fontSize: '12px', fontWeight: 600, borderRadius: 'var(--radius-sm)', background: '#ffffff', border: '1px solid #e2e8f0', color: 'var(--text-main)', outline: 'none', cursor: 'pointer' }}>
             <option value="citations">Most Cited</option>
             <option value="year">Newest First</option>
@@ -233,10 +251,58 @@ export default function PapersPage({ onNavigateToIngest, externalQuery }) {
       {/* Paper Grid */}
       {!loading && sortedPapers.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '18px' }}>
-          {sortedPapers.map((paper, idx) => (
+          {paginatedPapers.map((paper, idx) => (
             <PaperCard key={paper.id || paper.paper_id || idx} paper={paper} onOpenModal={(p) => setSelectedPaper(p)} />
           ))}
         </div>
+      )}
+
+      {!loading && totalPages > 1 && (
+        <nav aria-label="Paper pagination" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', flexWrap: 'nowrap', overflowX: 'auto', maxWidth: '100%', padding: '2px 0' }}>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            aria-label="Previous page"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            style={{ padding: '8px 10px' }}
+          >
+            <ChevronLeft size={15} />
+          </button>
+          {Array.from({ length: lastVisiblePage - firstVisiblePage + 1 }, (_, index) => firstVisiblePage + index).map((page) => (
+            <button
+              key={page}
+              type="button"
+              aria-label={`Go to page ${page}`}
+              aria-current={currentPage === page ? 'page' : undefined}
+              onClick={() => setCurrentPage(page)}
+              style={{
+                minWidth: '36px',
+                height: '36px',
+                padding: '0 10px',
+                borderRadius: 'var(--radius-sm)',
+                border: `1px solid ${currentPage === page ? 'var(--accent-purple)' : 'var(--border-color)'}`,
+                background: currentPage === page ? 'var(--accent-purple)' : '#ffffff',
+                color: currentPage === page ? '#ffffff' : 'var(--text-main)',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            type="button"
+            className="btn btn-secondary"
+            aria-label="Next page"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            style={{ padding: '8px 10px' }}
+          >
+            <ChevronRight size={15} />
+          </button>
+        </nav>
       )}
 
       {/* Empty state */}
